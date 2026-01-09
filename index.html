@@ -245,17 +245,34 @@
             });
 
             // Funkce pro start playlistu
+           // Vylepšená funkce pro start (Vypne shuffle + start od 1. písničky)
             const nastartujPlaylist = (device_id) => {
-                fetch(`https://api.spotify.com/v1/me/player/play?device_id=${device_id}`, {
+                const apiHeader = {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                };
+
+                // KROK 1: Vypnout Shuffle (náhodné přehrávání)
+                fetch(`https://api.spotify.com/v1/me/player/shuffle?state=false&device_id=${device_id}`, {
                     method: 'PUT',
-                    body: JSON.stringify({ context_uri: playlistURI }),
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                    },
-                }).then((res) => {
+                    headers: apiHeader
+                })
+                .then(() => {
+                    // KROK 2: Pustit playlist od začátku
+                    console.log('Shuffle vypnuto. Startuji playlist...');
+                    
+                    return fetch(`https://api.spotify.com/v1/me/player/play?device_id=${device_id}`, {
+                        method: 'PUT',
+                        body: JSON.stringify({ 
+                            context_uri: playlistURI,
+                            offset: { position: 0 } // <--- TOTO ZAJISTÍ START OD PRVNÍ SKLADBY
+                        }),
+                        headers: apiHeader
+                    });
+                })
+                .then((res) => {
                     if(res.ok) {
-                        console.log('Startuji motor!');
+                        console.log('Motor nahozen! Jedu od začátku.');
                         document.getElementById('status-text').innerText = "Jedu na plný plyn! ⚡";
                     } else {
                         console.error("Chyba startu:", res);
