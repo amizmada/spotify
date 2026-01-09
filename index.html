@@ -2,227 +2,315 @@
 <html lang="cs">
 <head>
     <meta charset="UTF-8">
-    <title>Blesk McQueen Spotify Player</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>McQueen Race Player</title>
     <link href="https://fonts.googleapis.com/css2?family=Racing+Sans+One&display=swap" rel="stylesheet">
     <style>
         :root {
-            --mcqueen-red: #D32F2F;
-            --rusteze-yellow: #FFD600;
-            --tire-black: #212121;
-            --off-white: #f5f5f5;
+            --red: #D32F2F;
+            --dark-red: #8f1212;
+            --yellow: #FFD600;
+            --black: #1a1a1a;
+            --white: #f5f5f5;
         }
 
         body {
-            background-color: var(--tire-black);
+            background-color: #222;
             font-family: 'Racing Sans One', cursive;
+            margin: 0;
+            height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
-            margin: 0;
-            color: var(--off-white);
+            color: var(--white);
+            /* Šachovnicové pozadí */
             background-image: 
-                linear-gradient(45deg, #000 25%, transparent 25%, transparent 75%, #000 75%, #000), 
-                linear-gradient(45deg, #000 25%, transparent 25%, transparent 75%, #000 75%, #000);
-            background-size: 40px 40px;
-            background-position: 0 0, 20px 20px;
-            background-color: #333; /* Šachovnicový podklad */
+                linear-gradient(45deg, #111 25%, transparent 25%, transparent 75%, #111 75%, #111), 
+                linear-gradient(45deg, #111 25%, transparent 25%, transparent 75%, #111 75%, #111);
+            background-size: 30px 30px;
+            background-position: 0 0, 15px 15px;
+            overflow: hidden; /* Zabrání scrollování na mobilu */
         }
 
         .dashboard {
-            background: linear-gradient(180deg, var(--mcqueen-red) 0%, #B71C1C 100%);
-            width: 350px;
-            border-radius: 20px;
-            padding: 30px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.8), inset 0 2px 10px rgba(255,255,255,0.3);
+            background: linear-gradient(180deg, var(--red) 0%, var(--dark-red) 100%);
+            width: 90%;
+            max-width: 400px; /* Maximální šířka pro PC */
+            border-radius: 25px;
+            padding: 25px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.9), inset 0 2px 10px rgba(255,255,255,0.4);
             text-align: center;
-            border: 4px solid var(--rusteze-yellow);
+            border: 5px solid var(--yellow);
             position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
-        /* Blesk na boku */
-        .dashboard::after {
-            content: '95';
+        /* Nálepka 95 */
+        .sticker-95 {
             position: absolute;
-            top: 10px;
-            right: 15px;
-            font-size: 24px;
-            color: var(--rusteze-yellow);
-            opacity: 0.8;
+            top: 15px;
+            right: 20px;
+            font-size: 30px;
+            color: var(--yellow);
+            text-shadow: 3px 3px 0 #c62828;
             transform: skew(-15deg);
+            z-index: 10;
+        }
+
+        /* Obrázek Bleska nad přehrávačem */
+        .mcqueen-img {
+            width: 120px;
+            height: auto;
+            margin-top: -70px; /* Aby "vyjížděl" z kapoty */
+            margin-bottom: 10px;
+            filter: drop-shadow(0 10px 10px rgba(0,0,0,0.5));
+            transition: transform 0.3s;
+            z-index: 20;
+        }
+        
+        .dashboard:hover .mcqueen-img {
+            transform: scale(1.1) rotate(-5deg);
+        }
+
+        .status-display {
+            background: rgba(0, 0, 0, 0.4);
+            padding: 5px 15px;
+            border-radius: 15px;
+            font-size: 14px;
+            color: var(--yellow);
+            margin-bottom: 15px;
+            letter-spacing: 1px;
         }
 
         #album-art {
-            width: 250px;
-            height: 250px;
+            width: 100%;
+            max-width: 280px; /* Aby nebyl obří na tabletu */
+            aspect-ratio: 1/1;
             border-radius: 15px;
-            border: 5px solid var(--tire-black);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
-            margin-bottom: 20px;
+            border: 4px solid var(--black);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.6);
+            margin-bottom: 15px;
             object-fit: cover;
             background-color: #000;
         }
 
+        .track-info {
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
         h2 {
-            margin: 10px 0 5px;
-            font-size: 24px;
-            text-shadow: 2px 2px 0px #000;
+            margin: 5px 0;
+            font-size: 1.5rem;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+            text-shadow: 2px 2px 0 #000;
         }
 
         p {
-            margin: 0 0 20px;
-            color: var(--rusteze-yellow);
-            font-size: 16px;
+            margin: 0;
+            color: var(--yellow);
+            font-size: 1rem;
             text-transform: uppercase;
-            letter-spacing: 1px;
         }
 
+        /* Startovací tlačítko */
+        #btn-start-engine {
+            width: 100%;
+            padding: 15px;
+            background: var(--yellow);
+            color: var(--black);
+            border: none;
+            border-radius: 50px;
+            font-family: inherit;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 6px 0 #F57F17, 0 10px 20px rgba(0,0,0,0.4);
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            animation: bounce 2s infinite;
+        }
+
+        #btn-start-engine:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 #F57F17;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
+        /* Ovládací panel */
         .controls {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            width: 100%;
+            max-width: 280px;
             background: rgba(0,0,0,0.3);
-            padding: 15px;
+            padding: 10px 20px;
             border-radius: 50px;
+            box-sizing: border-box; 
         }
 
-        button {
-            background: var(--rusteze-yellow);
+        button.control-btn {
+            background: var(--white);
             border: none;
-            color: var(--tire-black);
-            font-family: 'Racing Sans One', cursive;
+            color: var(--black);
+            font-family: inherit;
             cursor: pointer;
-            transition: transform 0.1s, background 0.2s;
-            text-transform: uppercase;
             border-radius: 50%;
             width: 50px;
             height: 50px;
-            font-size: 20px;
+            font-size: 24px;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 4px 0 #F57F17;
+            box-shadow: 0 4px 0 #999;
+            transition: all 0.1s;
         }
 
-        button:active {
+        button.control-btn:active {
             transform: translateY(4px);
-            box-shadow: 0 0 0 #F57F17;
+            box-shadow: 0 0 0 #999;
         }
 
         #btn-toggle {
             width: 70px;
             height: 70px;
-            font-size: 30px;
-            background: var(--off-white);
-            box-shadow: 0 4px 0 #BDBDBD;
+            font-size: 32px;
+            background: var(--yellow);
+            box-shadow: 0 5px 0 #F57F17;
         }
-
+        
         #btn-toggle:active {
-            box-shadow: 0 0 0 #BDBDBD;
+            box-shadow: 0 0 0 #F57F17;
         }
 
-        .status-bar {
-            margin-bottom: 15px;
-            font-size: 14px;
-            color: var(--rusteze-yellow);
-            background: rgba(0,0,0,0.5);
-            padding: 5px;
-            border-radius: 10px;
-        }
-
-        /* Animace při hraní */
-        .playing #album-art {
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.02); }
-            100% { transform: scale(1); }
+        /* Pro velmi malé telefony */
+        @media (max-height: 700px) {
+            .dashboard { padding: 15px; }
+            #album-art { max-width: 200px; }
+            .mcqueen-img { width: 90px; margin-top: -50px; }
         }
     </style>
 </head>
 <body>
 
     <div class="dashboard" id="player-container">
-        <div class="status-bar" id="status-text">Zahřívám motor...</div>
+        <img src="https://upload.wikimedia.org/wikipedia/en/2/27/Lightning_McQueen.png" alt="Blesk McQueen" class="mcqueen-img">
         
-        <img id="album-art" src="https://i.scdn.co/image/ab67616d0000b2735d496a7d65b1cb3b18563583" alt="Album">
+        <div class="sticker-95">95</div>
         
-        <h2 id="track-name">Čekám na závod</h2>
-        <p id="artist-name">Kachow!</p>
+        <div class="status-display" id="status-text">Zahřívám pneumatiky...</div>
+        
+        <button id="btn-start-engine">
+            NASTARTOVAT MOTOR ⚡
+        </button>
+
+        <img id="album-art" src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/35/Simple_Music.svg/600px-Simple_Music.svg.png" alt="Album Art">
+        
+        <div class="track-info">
+            <h2 id="track-name">Čekám na závod</h2>
+            <p id="artist-name">Spotify Player</p>
+        </div>
 
         <div class="controls">
-            <button id="btn-prev">⏮</button>
-            <button id="btn-toggle">▶</button>
-            <button id="btn-next">⏭</button>
+            <button class="control-btn" id="btn-prev">⏮</button>
+            <button class="control-btn" id="btn-toggle">▶</button>
+            <button class="control-btn" id="btn-next">⏭</button>
         </div>
     </div>
 
     <script src="https://sdk.scdn.co/spotify-player.js"></script>
     <script>
-        // TVŮJ VLOŽENÝ TOKEN
-        const token = 'BQCmTex_WeQz0VbpSndDEbOrxwQLnY3MQevIFWywf670g5Ohva_rbiPlFKb6__JAGq9cyyYKuJ_jHGk40YqCs6Hm2Mbzp5Nh5OXn0Rw_wrG8hUGqY8XjizgalE5bDU5S4rzL6JCT_GA0o1lyurHId59ubUWhbucUhlmuaJxx6asIbvQekaAF0I1SdADgID7YWmAWiVx6OQjRjJ3VtTUa2n3YJ0M43PLgquZeNgHyGtGoN29O_9C9AmUw3MC_Q7EKAJCd5rzMZPOScbGhYN6Tz3YvkyD89Wd_kIV-tXc_fosUznzo8Y_xMUkY18YdpSUiupzEII7wzD0OI-FTEw2oEqhelSuBxPFQnKurIvXjCaGiiq0QXX6kmRqCMJCafo-H3eAUaDPPANuUmZl2uYfv9U0dAhYnL-I';
+        // ==========================================
+        //  ZDE VLOŽ SVŮJ NOVÝ TOKEN (z konzole)
+        // ==========================================
+        const token = 'BQBXCmc51f8_rEaZXRnC-UVhJxe39MhR7ywarH2Z_yK8OF_Hl9HMXly8O4b0do0gEGGRhWxIcOgqdO5LSWozLkPnUpXPTVU2KpRpG0K9691QapvTFxDsML9omEmrHbYGcjo7sHY0izGwdPOjnjD9VGfK8jStGAclJly67Fsu4UtAgybOSaM-flTqAO3PAU37qWDq3gatniI2axG4diEnr9W7cjS51esAdE_IiWb1hofcJxEK7eOnth8BLwt_7z9-7vWKbYe-W2x1'; 
+        // ==========================================
+
+        const playlistURI = 'spotify:playlist:37i9dQZF1DX0XUsuxWHRQd'; // Tvůj Hip-Hop Playlist
 
         window.onSpotifyWebPlaybackSDKReady = () => {
             const player = new Spotify.Player({
-                name: 'Blesk McQueen Player',
+                name: 'McQueen Mobile Player',
                 getOAuthToken: cb => { cb(token); },
-                volume: 0.5
+                volume: 0.8
             });
 
-            // Logování chyb
-            player.addListener('initialization_error', ({ message }) => { console.error(message); });
-            player.addListener('authentication_error', ({ message }) => { 
-                console.error(message); 
-                document.getElementById('status-text').innerText = "Motor selhal! (Token vypršel?)";
-            });
-            player.addListener('account_error', ({ message }) => { console.error(message); });
-            player.addListener('playback_error', ({ message }) => { console.error(message); });
+            // Funkce pro start playlistu
+            const nastartujPlaylist = (device_id) => {
+                fetch(`https://api.spotify.com/v1/me/player/play?device_id=${device_id}`, {
+                    method: 'PUT',
+                    body: JSON.stringify({ context_uri: playlistURI }),
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                }).then((res) => {
+                    if(res.ok) {
+                        console.log('Startuji motor!');
+                        document.getElementById('status-text').innerText = "Jedu na plný plyn! ⚡";
+                    } else {
+                        console.error("Chyba startu:", res);
+                    }
+                });
+            };
 
-            // Přehrávač připraven
+            // Listenery
             player.addListener('ready', ({ device_id }) => {
                 console.log('Ready with Device ID', device_id);
-                document.getElementById('status-text').innerText = "🏁 Připraveno na startovní čáře! 🏁";
-                document.getElementById('artist-name').innerText = "Vyber v aplikaci: Blesk McQueen Player";
+                document.getElementById('status-text').innerText = "🏁 Připraveno! 🏁";
+
+                // Aktivace tlačítka Start
+                const startBtn = document.getElementById('btn-start-engine');
+                startBtn.onclick = () => {
+                    nastartujPlaylist(device_id);
+                    // Efekt kliknutí - skryje tlačítko po chvíli
+                    startBtn.innerText = "TÚROVÁNÍ MOTORU...";
+                    setTimeout(() => {
+                        startBtn.style.display = 'none'; // Schová tlačítko
+                    }, 2000);
+                };
             });
 
-            // Změna stavu (když začne hrát písnička)
             player.addListener('player_state_changed', state => {
                 if (!state) return;
-
                 const track = state.track_window.current_track;
                 const isPaused = state.paused;
 
-                // Aktualizace textů
+                // Update textů
                 document.getElementById('track-name').innerText = track.name;
                 document.getElementById('artist-name').innerText = track.artists[0].name;
                 document.getElementById('album-art').src = track.album.images[0].url;
                 
-                // Aktualizace tlačítka Play/Pause
+                // Update Play/Pause ikony
                 document.getElementById('btn-toggle').innerText = isPaused ? '▶' : '⏸';
-                
-                // Animace
-                const container = document.getElementById('player-container');
+
+                // Pokud hraje hudba, tlačítko Start zmizí (pokud tam ještě bylo)
                 if (!isPaused) {
-                    container.classList.add('playing');
-                    document.getElementById('status-text').innerText = "Jedu na plný plyn! ⚡";
-                } else {
-                    container.classList.remove('playing');
-                    document.getElementById('status-text').innerText = "Pit Stop (Pauza)";
+                     document.getElementById('btn-start-engine').style.display = 'none';
                 }
             });
 
-            // Připojení
+            // Chyby
+            player.addListener('authentication_error', ({ message }) => {
+                document.getElementById('status-text').innerText = "⚠ Došel benzín (Token vypršel)";
+                console.error(message);
+            });
+
             player.connect();
 
-            // Ovládání tlačítky
-            document.getElementById('btn-toggle').onclick = () => { player.togglePlay(); };
-            document.getElementById('btn-prev').onclick = () => { player.previousTrack(); };
-            document.getElementById('btn-next').onclick = () => { player.nextTrack(); };
+            // Tlačítka
+            document.getElementById('btn-toggle').onclick = () => player.togglePlay();
+            document.getElementById('btn-prev').onclick = () => player.previousTrack();
+            document.getElementById('btn-next').onclick = () => player.nextTrack();
         };
     </script>
 </body>
